@@ -50,9 +50,7 @@ spring:
 ---
 spring:
   profiles: production
-  java:
-    runtime:
-      version: 11
+
   datasource:
     url:  jdbc:postgresql://john.db.elephantsql.com:5432/jepvqmuk
     username: jepvqmuk
