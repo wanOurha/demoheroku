@@ -19,5 +19,8 @@ public class CorsConfig implements WebMvcConfigurer {
 		registry.addMapping("/product").allowedMethods("GET", "POST").allowedOrigins("http://localhost:3000");
 		registry.addMapping("/auth/login").allowedMethods("POST").allowedOrigins("http://localhost:3000");
 
+		registry.addMapping("/product").allowedMethods("GET", "POST").allowedOrigins("https://fir-host1-f1c19.web.app");
+		registry.addMapping("/auth/login").allowedMethods("POST").allowedOrigins("https://fir-host1-f1c19.web.app");
+
 	}
 }

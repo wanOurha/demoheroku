@@ -20,6 +20,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import com.example.demoheroku.exception.UnauthorizeException;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
@@ -52,22 +54,27 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 	// "keyV1" is secret key
 	private UsernamePasswordAuthenticationToken getAuthentication(String jwt) {
 		// replace from ... token to token
-		Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(jwt.replace(TOKEN_PREFIX, "")).getBody();
+		try {
+			Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(jwt.replace(TOKEN_PREFIX, ""))
+					.getBody();
 
-		// username in subject claims
-		String username = claims.getSubject();
-		if (username == null) {
-			return null;
-		}
-		// get object
-		ArrayList<String> roles = (ArrayList<String>) claims.get(CLAIMS_ROLE);
-		ArrayList<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
-		if (roles != null) {
-			for (String role : roles) {
-				grantedAuthorities.add(new SimpleGrantedAuthority(role));
+			// username in subject claims
+			String username = claims.getSubject();
+			if (username == null) {
+				return null;
 			}
+			// get object
+			ArrayList<String> roles = (ArrayList<String>) claims.get(CLAIMS_ROLE);
+			ArrayList<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+			if (roles != null) {
+				for (String role : roles) {
+					grantedAuthorities.add(new SimpleGrantedAuthority(role));
+				}
+			}
+			return new UsernamePasswordAuthenticationToken(username, null, grantedAuthorities);
+		} catch (Exception e) {
+			throw new UnauthorizeException(jwt);
 		}
-		return new UsernamePasswordAuthenticationToken(username, null, grantedAuthorities);
 
 	}
 
